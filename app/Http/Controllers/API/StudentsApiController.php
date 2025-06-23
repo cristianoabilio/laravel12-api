@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class StudentsApiController extends Controller
 {
@@ -26,7 +27,28 @@ class StudentsApiController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // validete input request
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|min:4',
+            'email' => 'required|unique:students,email',
+            'gender' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $validator->errors()
+            ], 400);
+        }
+
+        $data = $request->all();
+
+        Student::create($data);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Student created successfully'
+        ], 201);
     }
 
     /**
