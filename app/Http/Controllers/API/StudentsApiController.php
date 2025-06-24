@@ -56,7 +56,19 @@ class StudentsApiController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $Student = Student::find($id);
+
+        if ($Student) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $Student
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => 'fail',
+            'message' => 'No student found.'
+        ], 404);
     }
 
     /**
@@ -64,7 +76,39 @@ class StudentsApiController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|min:3',
+            'email' => 'required|unique:students,email,'.$id,
+            'gender' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => $validator->errors()
+            ], 400);
+        }
+
+        $student = Student::find($id);
+
+        if (! $student) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'No student found.'
+            ], 404);
+        }
+
+        $student->name = $request->name;
+        $student->email = $request->email;
+        $student->gender = $request->gender;
+        $student->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Student has been update successfully',
+            'data' => $student
+        ], 200);
+
     }
 
     /**
@@ -72,6 +116,20 @@ class StudentsApiController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $student = Student::find($id);
+
+        if (! $student) {
+            return response()->json([
+                'status' => 'fail',
+                'message' => 'Student not found.'
+            ], 400);
+        }
+
+        $student->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Student has been deleted.'
+        ]);
     }
 }
