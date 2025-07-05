@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogCategoryController;
+use App\Http\Controllers\API\BlogPostController;
 use App\Http\Controllers\API\StudentsApiController;
 use App\Http\Controllers\API\TestApiController;
 use Illuminate\Http\Request;
@@ -27,4 +28,11 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
 
     // Blog Categories
     Route::apiResource('/categories', BlogCategoryController::class);
+
+    // Blog Posts
+    Route::apiResource('/posts', BlogPostController::class);
+    Route::post('blog-post-image/{post}', [BlogPostController::class, 'blogPostImage'])->name('blog-post-image');
 });
+
+Route::get('/posts', [BlogPostController::class, 'index']);
+
