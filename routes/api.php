@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\BlogCategoryController;
 use App\Http\Controllers\API\BlogPostController;
+use App\Http\Controllers\API\CommentController;
 use App\Http\Controllers\API\LikeController;
 use App\Http\Controllers\API\StudentsApiController;
 use App\Http\Controllers\API\TestApiController;
@@ -23,6 +24,8 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
+Route::get('/comments/{post}', [CommentController::class, 'show'])->name('show');
+
 Route::group(['middleware' => 'auth:sanctum'], function() {
     Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -36,6 +39,12 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
         ->middleware(['role:admin,author']);
 
     Route::post('/post/react', [LikeController::class, 'react'])->name('react');
+
+    Route::apiResource('/comments', CommentController::class);
+
+    Route::get('/comments', [CommentController::class, 'index'])->name('index')->middleware(['role:admin']);
+
+    Route::post('/comments/change-status/{id}', [CommentController::class, 'changeStatus'])->name('changeStatus')->middleware(['role:admin']);
 });
 
 Route::get('/posts', [BlogPostController::class, 'index']);
