@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreCategoryValidator;
+use App\Http\Requests\UpdateCategoryValidator;
 use App\Models\BlogCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -28,19 +30,8 @@ class BlogCategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCategoryValidator $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $validator->errors()
-            ], 400);
-        }
-
         $data['name'] = $request->name;
         $data['slug'] = Str::slug($request->name);
 
@@ -63,19 +54,8 @@ class BlogCategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateCategoryValidator $request, string $id)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $validator->errors()
-            ], 400);
-        }
-
         $category = BlogCategory::find($id);
 
         if (! $category) {

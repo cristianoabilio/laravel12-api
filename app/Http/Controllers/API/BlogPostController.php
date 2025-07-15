@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreBlogPostValidator;
+use App\Http\Requests\UpdateBlogPostImageValidator;
+use App\Http\Requests\UpdateBlogPostValidator;
 use App\Models\BlogCategory;
 use App\Models\BlogPost;
 use App\Models\Seo;
@@ -30,26 +33,8 @@ class BlogPostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreBlogPostValidator $request)
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|numeric',
-            'category_id' => 'required|numeric',
-            'title' => 'required',
-            'content' => 'required',
-            'thumbnail' => 'nullable|image|max:2048',
-            'meta_title' => 'required',
-            'meta_description' => 'required',
-            'meta_keywords' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $validator->errors()
-            ], 400);
-        }
-
         // check if the user is the same of the one logged in
         $loggedUser = Auth::user();
 
@@ -127,7 +112,7 @@ class BlogPostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateBlogPostValidator $request, string $id)
     {
         $post = BlogPost::find($id);
 
@@ -137,32 +122,9 @@ class BlogPostController extends Controller
                 'message' => 'Post not found.'
             ], 404);
         }
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|numeric',
-            'category_id' => 'required|numeric',
-            'title' => 'required',
-            'content' => 'required',
-            'meta_title' => 'required',
-            'meta_description' => 'required',
-            'meta_keywords' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $validator->errors()
-            ], 400);
-        }
 
         // check if the user is the same of the one logged in
         $loggedUser = Auth::user();
-
-        // if ($loggedUser->id != $request->user_id) {
-        //     return response()->json([
-        //         'status' => 'fail',
-        //         'message' => 'Unauthorized access.'
-        //     ], 400);
-        // }
 
         // check if the category id is valid
         $category = BlogCategory::find($request->category_id);
@@ -203,7 +165,7 @@ class BlogPostController extends Controller
         ], 403);
     }
 
-    public function blogPostImage(Request $request, int $id)
+    public function blogPostImage(UpdateBlogPostImageValidator $request, int $id)
     {
         $post = BlogPost::find($id);
 
@@ -214,26 +176,7 @@ class BlogPostController extends Controller
             ], 404);
         }
 
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|numeric',
-            'thumbnail' => 'nullable|image|max:2048'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $validator->errors()
-            ], 400);
-        }
-
         $loggedUser = Auth::user();
-
-        // if ($loggedUser->id != $request->user_id) {
-        //     return response()->json([
-        //         'status' => 'fail',
-        //         'message' => 'Unauthorized access.'
-        //     ], 400);
-        // }
 
         $imagePath = null;
 

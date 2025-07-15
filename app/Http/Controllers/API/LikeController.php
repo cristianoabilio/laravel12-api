@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreReactionValidator;
 use App\Models\Like;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-
 class LikeController extends Controller
 {
     /**
@@ -20,20 +19,8 @@ class LikeController extends Controller
     /**
      * like and dislike reaction
      */
-    public function react(Request $request)
+    public function react(StoreReactionValidator $request)
     {
-        $validator = Validator::make($request->all(), [
-            'post_id' => 'required|integer|exists:blog_posts,id',
-            'status' => 'required|integer'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $validator->errors()
-            ], 400);
-        }
-
         $userId = auth()->id();
         $postId = $request->post_id;
         $status = $request->status;

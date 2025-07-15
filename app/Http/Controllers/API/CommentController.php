@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ChangeCommentStatusValidator;
+use App\Http\Requests\StoreCommentValidator;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,20 +29,8 @@ class CommentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCommentValidator $request)
     {
-        $validator = Validator::make($request->all(), [
-            'post_id' => 'required|integer|exists:blog_posts,id',
-            'content' => 'required'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $validator->errors()
-            ], 400);
-        }
-
         $data = [
             'post_id' => $request->post_id,
             'parent_id' => $request->parent_id ?? null,
@@ -56,20 +46,8 @@ class CommentController extends Controller
         ], 201);
     }
 
-    public function changeStatus(Request $request, $commentId)
+    public function changeStatus(ChangeCommentStatusValidator $request, $commentId)
     {
-        $validator = Validator::make($request->all(), [
-            'comment_id' => 'required|integer|exists:comments,id',
-            'status' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 'fail',
-                'message' => $validator->errors()
-            ], 400);
-        }
-
         $comment = Comment::find($request->comment_id);
 
         if (! $comment) {
