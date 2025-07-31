@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 // First API Route for testing
 
-Route::get('/test', [TestApiController::class, 'test'])->name('test-api');
+Route::middleware('throttle:api')->get('/test', [TestApiController::class, 'test'])->name('test-api');
 
 Route::apiResource('/students', StudentsApiController::class);
 
@@ -26,7 +26,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 Route::get('/comments/{post}', [CommentController::class, 'show'])->name('show');
 
-Route::group(['middleware' => 'auth:sanctum'], function() {
+Route::group(['middleware' => 'auth:sanctum', 'throttle:api'], function() {
     Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -38,7 +38,7 @@ Route::group(['middleware' => 'auth:sanctum'], function() {
     Route::post('blog-post-image/{post}', [BlogPostController::class, 'blogPostImage'])->name('blog-post-image')
         ->middleware(['role:admin,author']);
 
-    Route::post('/post/react', [LikeController::class, 'react'])->name('react');
+    Route::middleware('throttle:reactions')->post('/post/react', [LikeController::class, 'react'])->name('react');
 
     Route::apiResource('/comments', CommentController::class);
 
