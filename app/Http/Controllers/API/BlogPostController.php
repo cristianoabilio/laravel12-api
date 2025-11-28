@@ -21,7 +21,7 @@ class BlogPostController extends Controller
      */
     public function index()
     {
-        $posts = BlogPost::with('seo_data')->get();
+        $posts = BlogPost::with('seo_data')->simplePaginate(3);
 
         return response()->json([
             'status' => 'success',
